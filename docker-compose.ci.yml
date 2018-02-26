@@ -1,10 +1,20 @@
 version: "3.3"
 services:
   nginx:
-    image: quay.io/azavea/districtbuilder-nginx:${GIT_COMMIT}
+    image: quay.io/azavea/districtbuilder-nginx:${TRAVIS_COMMIT}
   django:
-    image: quay.io/azavea/districtbuilder-app:${GIT_COMMIT}
+    image: quay.io/azavea/districtbuilder-app:${TRAVIS_COMMIT}
   geoserver:
-    image: quay.io/azavea/districtbuilder-geoserver:${GIT_COMMIT}
+    image: quay.io/azavea/districtbuilder-geoserver:${TRAVIS_COMMIT}
   terraform:
     image: quay.io/azavea/terraform:0.10.8
+    working_dir: /usr/local/src
+    environment:
+      - AWS_PROFILE=district-builder
+      - DB_DEBUG=1
+      - DB_SETTINGS_BUCKET=districtbuilder-staging-config-us-east-1
+      - TRAVIS_COMMIT=${TRAVIS_COMMIT:-latest}
+    entrypoint: bash
+    volumes:
+      - ./:/usr/local/src
+      - ~/.aws:/root/.aws

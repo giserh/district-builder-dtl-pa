@@ -11,3 +11,7 @@ sld
 geoserver/data_dir
 data
 config_settings.py
+deployment/terraform/.terraform
+*.tfplan
+*.tfvars
+*.tfstate*
