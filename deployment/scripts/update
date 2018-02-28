@@ -1,0 +1,47 @@
+#!/bin/bash
+set -ex
+
+function usage() {
+
+    echo -n \
+"Usage: $(basename "$0")
+Setup project containers and database.
+"
+}
+
+function run_migrations() {
+    echo "Running migrations"
+    docker-compose \
+        exec -T django ./manage.py migrate
+}
+
+function write_settings() {
+    # Write config_settings to the filesystem so it doesn't get
+    # overwritten by docker-compose volume mounts
+    docker-compose run --rm --entrypoint "bash -c" django \
+        "python -m district_builder_config.generate_settings \
+            config/config.xsd \
+            config/config.xml \
+            publicmapping/config_settings.py"
+
+}
+
+function change_geoserver_admin_password() {
+    docker-compose \
+        exec -T geoserver ./bin/change_admin_password.sh
+}
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]
+then
+    if [ "${1:-}" = "--help" ]
+    then
+        usage
+    else
+        docker-compose pull
+        write_settings
+        docker-compose up -d django
+        run_migrations
+        #change_geoserver_admin_password
+    fi
+    exit
+fi

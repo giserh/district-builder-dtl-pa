@@ -1,0 +1,17 @@
+---
+user_data_dir: "{{ playbook_dir }}/../user-data/"
+deployment_scripts_dir: "{{ playbook_dir }}/../scripts"
+
+districtbuilder_app_home: "/opt/district-builder"
+
+districtbuilder_image_version: "{{ lookup('env', 'TRAVIS_COMMIT') | default('latest', true) }}"
+districtbuilder_user_config_file: true
+districtbuilder_web_app_password: districtbuilderdistrictbuilder
+districtbuilder_admin_user: admin
+districtbuilder_admin_email: admin@admin.com
+districtbuilder_admin_password: districtbuilderdistrictbuilder
+districtbuilder_database_password: districtbuilderdistrictbuilder
+districtbuilder_database_user: district_builder
+districtbuilder_redis_password: districtbuilder
+districtbuilder_geoserver_user: admin
+districtbuilder_geoserver_password: geoserver
