@@ -10,11 +10,13 @@ services:
     build: 
       context: ./deployment
     environment:
-      - AWS_PROFILE=district-builder
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION:-us-east-1}
       - DB_DEBUG=1
       - DB_SETTINGS_BUCKET=districtbuilder-staging-config-us-east-1
       - TRAVIS_COMMIT=${TRAVIS_COMMIT:-latest}
-    entrypoint: bash
+      - ANSIBLE_INVENTORY_FILE=${ANSIBLE_INVENTORY_FILE:-staging}
     volumes:
       - ./:/usr/local/src
-      - ~/.aws:/root/.aws
+      - ~/.ssh:/root/.ssh

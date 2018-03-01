@@ -6,6 +6,13 @@ if [[ -n "${DB_DEBUG}" ]]; then
 fi
 
 DIR="$(dirname "${0}")"
+ANSIBLE_DIR="${DIR}/../deployment/ansible"
+BRANCH="${TRAVIS_BRANCH:-develop}"
+
+if [ "${TRAVIS_BRANCH}" = "master" ]; then
+  ANSIBLE_INVENTORY_FILE="production"
+  export ANSIBLE_INVENTORY_FILE
+fi
 
 function usage() {
     echo -n \
@@ -24,6 +31,13 @@ then
 
     # Publish containers
     "${DIR}/cipublish"
+
+    docker-compose -f docker-compose.ci.yml build terraform
+
+    # Run deployments
+    docker-compose -f docker-compose.ci.yml run --rm terraform ./scripts/infra plan
+    docker-compose -f docker-compose.ci.yml run --rm terraform ./scripts/infra apply
+
 
     fi
     exit

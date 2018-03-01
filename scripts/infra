@@ -10,6 +10,7 @@ set -u
 
 DIR="$(dirname "$0")"
 TERRAFORM_DIR="${DIR}/../deployment/terraform"
+ANSIBLE_DIR="${DIR}/../deployment/ansible"
 
 function usage() {
     echo -n \
@@ -22,11 +23,11 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     if [ "${1:-}" = "--help" ]; then
         usage
     else
-        if [[ -n "${DB_SETTINGS_BUCKET}" ]]; then
+        if [[ -n "${DB_SETTINGS_BUCKET}" ]] && [[ -n "${ANSIBLE_INVENTORY_FILE}" ]]; then
 
             pushd "${TERRAFORM_DIR}"
 
-            #aws s3 cp "s3://${DB_SETTINGS_BUCKET}/terraform/terraform.tfvars" "${DB_SETTINGS_BUCKET}.tfvars"
+            aws s3 cp "s3://${DB_SETTINGS_BUCKET}/terraform/terraform.tfvars" "${DB_SETTINGS_BUCKET}.tfvars"
 
             echo
             echo "Attempting to deploy application version [${TRAVIS_COMMIT}]..."
@@ -41,11 +42,20 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
                               -backend-config="key=terraform/state"
                     terraform plan \
                               -var-file="${DB_SETTINGS_BUCKET}.tfvars" \
-                              -var="image_version=\"${TRAVIS_COMMIT}\"" \
                               -out="${DB_SETTINGS_BUCKET}.tfplan"
+                    popd
                     ;;
                 apply)
                     terraform apply "${DB_SETTINGS_BUCKET}.tfplan"
+                    popd
+                    
+                    # Provision app server with Ansible
+                    eval $(ssh-agent)
+                    pushd "${ANSIBLE_DIR}"
+                    ssh-add ~/.ssh/district-builder.pem
+
+                    ansible-playbook -vvvv -i "inventory/${ANSIBLE_INVENTORY_FILE}" \
+                      district-builder-app-server.yml                    
                     ;;
                 *)
                     echo "ERROR: I don't have support for that Terraform subcommand!"
@@ -55,7 +65,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
             popd
         else
-            echo "ERROR: No DB_SETTINGS_BUCKET variable defined."
+            echo "ERROR: No DB_SETTINGS_BUCKET or ANSIBLE_INVENTORY variable defined."
             exit 1
         fi
     fi
