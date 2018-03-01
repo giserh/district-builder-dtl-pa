@@ -7,8 +7,8 @@ services:
   geoserver:
     image: quay.io/azavea/districtbuilder-geoserver:${TRAVIS_COMMIT}
   terraform:
-    image: quay.io/azavea/terraform:0.10.8
-    working_dir: /usr/local/src
+    build: 
+      context: ./deployment
     environment:
       - AWS_PROFILE=district-builder
       - DB_DEBUG=1
