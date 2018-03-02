@@ -18,3 +18,4 @@ deployment/terraform/.terraform
 *.retry
 deployment/ansible/roles/district-builder.app-server/defaults/main.yml
 deployment/user-data
+deployment/ansible/inventory

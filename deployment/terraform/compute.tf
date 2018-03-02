@@ -33,10 +33,51 @@ data "aws_ami" "ecs_ami" {
   }
 }
 
+data "template_file" "ansible_variables" {
+  template = "${file("templates/main.yml.tpl")}"
+
+  vars {
+    web_app_password = "${var.districtbuilder_web_app_password}"
+    admin_user = "${var.districtbuilder_admin_user}"
+    admin_email = "${var.districtbuilder_admin_email}"
+    admin_password = "${var.districtbuilder_admin_password}"
+    database_name = "${var.rds_database_name}"
+    database_password = "${var.rds_database_password}"
+    database_user = "${var.rds_database_username}"
+    redis_password = "${var.districtbuilder_redis_password}"
+    geoserver_user = "${var.districtbuilder_geoserver_user}"
+    geoserver_password = "${var.districtbuilder_geoserver_password}"
+  }
+}
+
+resource "local_file" "ansible_variables" {
+  content = "${data.template_file.ansible_variables.rendered}"
+  filename = "${path.root}/../ansible/roles/district-builder.app-server/defaults/main.yml"
+}
+
+data "template_file" "ansible_inventory" {
+  template = "${file("templates/ansible_inventory.tpl")}"
+
+  vars {
+    internal_zone_name = "${var.route53_private_zone_name}"
+    external_zone_name = "${var.route53_public_zone_name}"
+  }
+}
+
+resource "local_file" "ansible_inventory" {
+  content = "${data.template_file.ansible_inventory.rendered}"
+  filename = "${path.root}/../ansible/inventory/${lower(var.environment)}"
+}
+
 resource "aws_instance" "app_server" {
+
+  depends_on = [
+    "local_file.ansible_inventory",
+    "local_file.ansible_variables"
+  ]
+
   ami = "${data.aws_ami.ecs_ami.id}"
 
-  disable_api_termination              = true
   instance_initiated_shutdown_behavior = "stop"
   instance_type                        = "${var.app_server_instance_type}"
   key_name                             = "${var.aws_key_name}"
@@ -51,6 +92,30 @@ resource "aws_instance" "app_server" {
   }
 }
 
+resource "null_resource" "provision_app_server" {
+  depends_on = [
+    "local_file.ansible_inventory",
+    "local_file.ansible_variables"
+  ]
+
+  triggers {
+    uuid = "${uuid()}"
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-cex"]
+    command = <<SCRIPT
+eval $(ssh-agent)
+ssh-add ~/.ssh/district-builder.pem
+pushd ${path.root}/../ansible
+ansible-galaxy install -r roles.yml -p roles/
+aws ec2 wait instance-running --instance-ids=${aws_instance.app_server.id} --region=${var.aws_region}
+ansible-playbook -i inventory/${lower(var.environment)} \
+  district-builder-app-server.yml
+popd
+SCRIPT
+  }
+}
 resource "aws_security_group" "app_server_alb" {
   vpc_id = "${module.vpc.id}"
 

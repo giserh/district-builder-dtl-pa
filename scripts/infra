@@ -43,19 +43,9 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
                     terraform plan \
                               -var-file="${DB_SETTINGS_BUCKET}.tfvars" \
                               -out="${DB_SETTINGS_BUCKET}.tfplan"
-                    popd
                     ;;
                 apply)
                     terraform apply "${DB_SETTINGS_BUCKET}.tfplan"
-                    popd
-                    
-                    # Provision app server with Ansible
-                    eval $(ssh-agent)
-                    pushd "${ANSIBLE_DIR}"
-                    ssh-add ~/.ssh/district-builder.pem
-
-                    ansible-playbook -vvvv -i "inventory/${ANSIBLE_INVENTORY_FILE}" \
-                      district-builder-app-server.yml                    
                     ;;
                 *)
                     echo "ERROR: I don't have support for that Terraform subcommand!"

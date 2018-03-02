@@ -104,3 +104,11 @@ variable "route53_private_zone_name" {
 }
 
 variable "ssl_certificate_arn" {}
+
+variable "districtbuilder_web_app_password" {}
+variable "districtbuilder_admin_user" {}
+variable "districtbuilder_admin_email" {}
+variable "districtbuilder_admin_password" {}
+variable "districtbuilder_redis_password" {}
+variable "districtbuilder_geoserver_user" {}
+variable "districtbuilder_geoserver_password" {}
