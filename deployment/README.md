@@ -8,15 +8,13 @@ Amazon Web Services deployment is driven by [Terraform](https://terraform.io/), 
 * [Deployment](#deployment)
     * [Pre-Deployment Configuration](#pre-deployment-configuration)
     * [SSH Keys](#ssh-keys)
-    * [DB_SETTINGS_BUCKET](#db-settings-bucket)
+    * [DB_SETTINGS_BUCKET](#db_settings_bucket)
     * [User Data](#user-data)
-    * [`scripts/infra`](#scripts-infra)
+    * [`scripts/infra`](#scriptsinfra)
     * [Loading Shapefile data](#loading-shapefile-data)
 
 
-## Credentials
-
-### AWS
+## AWS Credentials
 Using the AWS CLI, create an AWS profile named `district-builder`:
 
 ```bash
