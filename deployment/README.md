@@ -53,7 +53,9 @@ Once the settings ucket and User Data are configured, you can run the deployment
 ```bash
 $ export DB_SETTINGS_BUCKET="districtbuilder-staging-config-us-east-1"
 vagrant@vagrant-ubuntu-trusty-64:~$ export AWS_PROFILE="district-builder"
-vagrant@vagrant-ubuntu-trusty-64:~$ export TRAVIS_COMMIT=123456"
+
+# IMAGE_VERSION can be a git SHA, or version tag
+vagrant@vagrant-ubuntu-trusty-64:~$ export IMAGE_VERSION=123456"
 vagrant@vagrant-ubuntu-trusty-64:~$ ./scripts/infra plan
 ```
 
