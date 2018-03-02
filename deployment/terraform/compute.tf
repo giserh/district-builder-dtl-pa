@@ -37,6 +37,7 @@ data "template_file" "ansible_variables" {
   template = "${file("templates/main.yml.tpl")}"
 
   vars {
+    image_version = "${var.districtbuilder_image_version}"
     web_app_password = "${var.districtbuilder_web_app_password}"
     admin_user = "${var.districtbuilder_admin_user}"
     admin_email = "${var.districtbuilder_admin_email}"

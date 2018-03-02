@@ -30,7 +30,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
             aws s3 cp "s3://${DB_SETTINGS_BUCKET}/terraform/terraform.tfvars" "${DB_SETTINGS_BUCKET}.tfvars"
 
             echo
-            echo "Attempting to deploy application version [${TRAVIS_COMMIT}]..."
+            echo "Attempting to deploy application version [${IMAGE_VERSION}]..."
             echo "-----------------------------------------------------"
             echo
 
@@ -42,6 +42,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
                               -backend-config="key=terraform/state"
                     terraform plan \
                               -var-file="${DB_SETTINGS_BUCKET}.tfvars" \
+                              -var="image_version=\"${IMAGE_VERSION}\""
                               -out="${DB_SETTINGS_BUCKET}.tfplan"
                     ;;
                 apply)

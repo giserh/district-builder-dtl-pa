@@ -35,8 +35,8 @@ then
     docker-compose -f docker-compose.ci.yml build terraform
 
     # Run deployments
-    docker-compose -f docker-compose.ci.yml run --rm terraform ./scripts/infra plan
-    docker-compose -f docker-compose.ci.yml run --rm terraform ./scripts/infra apply
+    IMAGE_VERSION="${TRAVIS_COMMIT}" docker-compose -f docker-compose.ci.yml run --rm terraform ./scripts/infra plan
+    IMAGE_VERSION="${TRAVIS_COMMIT}" docker-compose -f docker-compose.ci.yml run --rm terraform ./scripts/infra apply
 
 
     fi

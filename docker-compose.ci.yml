@@ -15,8 +15,7 @@ services:
       - AWS_REGION=${AWS_REGION:-us-east-1}
       - DB_DEBUG=1
       - DB_SETTINGS_BUCKET=districtbuilder-staging-config-us-east-1
-      - TRAVIS_COMMIT=${TRAVIS_COMMIT:-latest}
-      - ANSIBLE_INVENTORY_FILE=${ANSIBLE_INVENTORY_FILE:-staging}
+      - IMAGE_VERSION=${IMAGE_VERSION:-latest}
     volumes:
       - ./:/usr/local/src
       - ~/.ssh:/root/.ssh
