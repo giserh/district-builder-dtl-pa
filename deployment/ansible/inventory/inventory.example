@@ -1,0 +1,11 @@
+app-server=app-server.<ROUTE 53 INTERNAL HOSTED ZONE>
+
+[app-server]
+app-server.<YOUR INTERNAL HOSTED ZONE>
+
+[app-server:vars]
+; Proxy ansible commands through bastion host
+; see https://docs.ansible.com/ansible/latest/faq.html#how-do-i-configure-a-jump-host-to-access-servers-that-i-have-no-direct-access-to
+;
+ansible_ssh_common_args="-o ProxyCommand='ssh ubuntu@bastion.<ROUTE 53 EXTERNAL HOSTED ZONE> -W %h:%p'"
+ansible_user="ec2-user"
