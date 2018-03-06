@@ -22,11 +22,11 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     if [ "${1:-}" = "--help" ]; then
         usage
     else
-        if [[ -n "${DB_SETTINGS_BUCKET}" ]]; then
+        if [[ -n "${DISTRICTBUILDER_SETTINGS_BUCKET}" ]]; then
 
             pushd "${TERRAFORM_DIR}"
 
-            aws s3 cp "s3://${DB_SETTINGS_BUCKET}/terraform/terraform.tfvars" "${DB_SETTINGS_BUCKET}.tfvars"
+            aws s3 cp "s3://${DISTRICTBUILDER_SETTINGS_BUCKET}/terraform/terraform.tfvars" "${DISTRICTBUILDER_SETTINGS_BUCKET}.tfvars"
 
             echo
             echo "Attempting to deploy application version [${IMAGE_VERSION}]..."
@@ -37,15 +37,15 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
                 plan)
                     rm -rf .terraform terraform.tfstate*
                     terraform init \
-                              -backend-config="bucket=${DB_SETTINGS_BUCKET}" \
+                              -backend-config="bucket=${DISTRICTBUILDER_SETTINGS_BUCKET}" \
                               -backend-config="key=terraform/state"
                     terraform plan \
-                              -var-file="${DB_SETTINGS_BUCKET}.tfvars" \
+                              -var-file="${DISTRICTBUILDER_SETTINGS_BUCKET}.tfvars" \
                               -var="image_version=\"${IMAGE_VERSION}\""
-                              -out="${DB_SETTINGS_BUCKET}.tfplan"
+                              -out="${DISTRICTBUILDER_SETTINGS_BUCKET}.tfplan"
                     ;;
                 apply)
-                    terraform apply "${DB_SETTINGS_BUCKET}.tfplan"
+                    terraform apply "${DISTRICTBUILDER_SETTINGS_BUCKET}.tfplan"
                     ;;
                 *)
                     echo "ERROR: I don't have support for that Terraform subcommand!"
@@ -55,7 +55,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
             popd
         else
-            echo "ERROR: No DB_SETTINGS_BUCKET variable defined."
+            echo "ERROR: No DISTRICTBUILDER_SETTINGS_BUCKET variable defined."
             exit 1
         fi
     fi

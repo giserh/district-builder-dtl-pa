@@ -14,7 +14,7 @@ services:
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_REGION=${AWS_REGION:-us-east-1}
       - DB_DEBUG=1
-      - DB_SETTINGS_BUCKET=districtbuilder-staging-config-us-east-1
+      - DISTRICTBUILDER_SETTINGS_BUCKET=${DISTRICTBUILDER_SETTINGS_BUCKET:-districtbuilder-staging-config-us-east-1}
       - IMAGE_VERSION=${IMAGE_VERSION:-latest}
     volumes:
       - ./:/usr/local/src

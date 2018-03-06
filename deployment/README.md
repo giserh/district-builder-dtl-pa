@@ -7,7 +7,7 @@ Amazon Web Services deployment is driven by [Terraform](https://terraform.io/), 
 * [Deployment](#deployment)
     * [Pre-Deployment Configuration](#pre-deployment-configuration)
     * [SSH Keys](#ssh-keys)
-    * [DB_SETTINGS_BUCKET](#db_settings_bucket)
+    * [DISTRICTBUILDER_SETTINGS_BUCKET](#districtbuilder_settings_bucket)
     * [User Data](#user-data)
     * [`scripts/infra`](#scriptsinfra)
     * [Loading Shapefile data](#loading-shapefile-data)
@@ -20,26 +20,26 @@ Amazon Web Services deployment is driven by [Terraform](https://terraform.io/), 
 
 You'll also need to generate an SSH Keypair using the AWS EC2 console. Download the private key, and store it at `~/.ssh/district-builder.pem`.
 
-#### DB_SETTINGS_BUCKET
+#### DISTRICTBUILDER_SETTINGS_BUCKET
 
-Before running `scripts/infra`, create an AWS S3 bucket to house the terraform remote state and configuration file. Make note of the bucket name, it will be the value of the `DB_SETTINGS_BUCKET` environment variable later on.
+Before running `scripts/infra`, create an AWS S3 bucket to house the terraform remote state and configuration file. Make note of the bucket name, it will be the value of the `DISTRICTBUILDER_SETTINGS_BUCKET` environment variable later on.
 
-You'll also need to create a `terraform.tfvars` file, which contains the configuration parameters for your infrastructure and application. You can see the available configuration options in [`sample.tfvars`](./terraform/sample.tfvars). Modify this file to suit your needs, and store it on S3 at `s3://${DB_SETTINGS_BUCKET}/terraform/terraform.tfvars`. Note that Application server configuration such as admin usernames and passwords are prefied with `districtbuilder_` (i.e. `districtbuilder_admin_user`).
+You'll also need to create a `terraform.tfvars` file, which contains the configuration parameters for your infrastructure and application. You can see the available configuration options in [`sample.tfvars`](./terraform/sample.tfvars). Modify this file to suit your needs, and store it on S3 at `s3://${DISTRICTBUILDER_SETTINGS_BUCKET}/terraform/terraform.tfvars`. Note that Application server configuration such as admin usernames and passwords are prefied with `districtbuilder_` (i.e. `districtbuilder_admin_user`).
 
 #### User Data
 
 You can also upload your own DistrictBuilder `config.xml` (optional) and shapefile zip (required) to the App server as a part of provisioning. Simply add a DistrictBuilder `config.xml` file and `districtbuilder_data.zip` in the [`user-data`](./user-data/) folder, and the provisioner will upload them to the server for you. 
 
 #### `scripts/infra`
-Once the settings ucket and User Data are configured, you can run the deployment. To deploy the DistrictBuilder core services (VPC, EC2, RDS, etc.) resources, use the `infra` wrapper script to lookup the remote state of the infrastructure and assemble a plan for work to be done.
+Once the settings bucket and User Data are configured, you can run the deployment. To deploy the DistrictBuilder core services (VPC, EC2, RDS, etc.) resources, use the `infra` wrapper script to lookup the remote state of the infrastructure and assemble a plan for work to be done.
 
-First, obtain your account's AWS API keypair, and add them to your environment. Then, set `DB_SETTINGS_BUCKET` and `IMAGE_VERSION`, and run `scripts/infra`:
+First, obtain your account's AWS API keypair, and add them to your environment. Then, set `DISTRICTBUILDER_SETTINGS_BUCKET` and `IMAGE_VERSION`, and run `scripts/infra`:
 
 
 ```bash
 $ export AWS_ACCESS_KEY_ID="****************F2DQ"
 $ export AWS_ACCESS_KEY_ID="****************TLJ/"
-$ export DB_SETTINGS_BUCKET="districtbuilder-staging-config-us-east-1"
+$ export DISTRICTBUILDER_SETTINGS_BUCKET="districtbuilder-staging-config-us-east-1"
 
 # IMAGE_VERSION can be a git SHA, or version tag
 $ export IMAGE_VERSION=123456"
