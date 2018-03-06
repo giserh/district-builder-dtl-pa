@@ -102,7 +102,7 @@ variable "app_server_availability_zone" {}
 variable "route53_public_zone_name" {}
 
 variable "route53_private_zone_name" {
-  default = "internal.districtbuilder.com"
+  default = "districtbuilder.internal"
 }
 
 variable "ssl_certificate_arn" {}
