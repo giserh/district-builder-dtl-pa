@@ -29,6 +29,7 @@ before_deploy:
   - mv django/publicmapping/config/config.xml deployment/user-data/config.xml
 deploy:
 - provider: script
+  skip_cleanup: true
   script: scripts/deploy
   on:
     repo: PublicMapping/DistrictBuilder

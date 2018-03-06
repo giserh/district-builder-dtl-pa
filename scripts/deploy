@@ -28,8 +28,8 @@ then
     docker-compose -f docker-compose.ci.yml build terraform
 
     # Run deployments
-    IMAGE_VERSION="${TRAVIS_COMMIT:0:7}" docker-compose -f docker-compose.ci.yml run --rm terraform ./scripts/infra plan
-    IMAGE_VERSION="${TRAVIS_COMMIT:0:7}" docker-compose -f docker-compose.ci.yml run --rm terraform ./scripts/infra apply
+    IMAGE_VERSION="${TRAVIS_COMMIT:0:7}" docker-compose -f docker-compose.ci.yml run --rm terraform ./scripts/infra plan | grep -v "password"
+    IMAGE_VERSION="${TRAVIS_COMMIT:0:7}" docker-compose -f docker-compose.ci.yml run --rm terraform ./scripts/infra apply | grep -v "password"
 
 
     fi
