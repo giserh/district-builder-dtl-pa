@@ -32,7 +32,7 @@ deploy:
   script: scripts/deploy
   on:
     repo: PublicMapping/DistrictBuilder
-    branch: feature/tnation/production-deploy
+    branch: feature/tnation/production-deployment
 after_deploy:
   - git clean -fdx
   - rm -f ~/.ssh/district-builder.pem
