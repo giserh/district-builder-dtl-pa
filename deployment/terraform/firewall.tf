@@ -1,3 +1,10 @@
+#
+# VPC Security Group Resources
+#
+
+#
+# Bastion Security Group Resources
+#
 resource "aws_security_group_rule" "bastion_ssh_ingress" {
   type              = "ingress"
   from_port         = "22"
@@ -43,6 +50,11 @@ resource "aws_security_group_rule" "bastion_postgresql_egress" {
   security_group_id        = "${module.vpc.bastion_security_group_id}"
   source_security_group_id = "${module.database.database_security_group_id}"
 }
+
+
+#
+# App Server Security Group Resources
+#
 
 resource "aws_security_group_rule" "app_server_bastion_ingress" {
   type      = "ingress"
@@ -94,6 +106,10 @@ resource "aws_security_group_rule" "app_server_https_egress" {
   security_group_id        = "${aws_security_group.app_server.id}"
 }
 
+#
+# Database Security Group Resources
+#
+
 resource "aws_security_group_rule" "postgresql_bastion_ingress" {
   type      = "ingress"
   from_port = 5432
@@ -113,6 +129,10 @@ resource "aws_security_group_rule" "postgresql_app_server_ingress" {
   security_group_id        = "${module.database.database_security_group_id}"
   source_security_group_id = "${aws_security_group.app_server.id}"
 }
+
+#
+# App Server Loadbalancer Security Group Resources
+#
 
 resource "aws_security_group_rule" "app_server_alb_http_ingress" {
   type              = "ingress"
