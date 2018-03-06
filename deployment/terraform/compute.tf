@@ -126,6 +126,7 @@ popd
 SCRIPT
   }
 }
+
 resource "aws_security_group" "app_server_alb" {
   vpc_id = "${module.vpc.id}"
 
