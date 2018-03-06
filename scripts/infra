@@ -41,7 +41,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
                               -backend-config="key=terraform/state"
                     terraform plan \
                               -var-file="${DISTRICTBUILDER_SETTINGS_BUCKET}.tfvars" \
-                              -var="image_version=\"${IMAGE_VERSION}\""
+                              -var="districtbuilder_image_version=\"${IMAGE_VERSION}\"" \
                               -out="${DISTRICTBUILDER_SETTINGS_BUCKET}.tfplan"
                     ;;
                 apply)
