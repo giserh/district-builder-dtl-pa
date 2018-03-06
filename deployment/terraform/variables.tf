@@ -19,6 +19,9 @@ variable "aws_key_name" {}
 variable "vpc_cidr_block" {}
 
 variable "external_access_cidr_block" {}
+variable "bastion_external_access_cidr_block" {
+  type = "list"
+}
 
 variable "vpc_private_subnet_cidr_blocks" {
   type = "list"
