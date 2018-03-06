@@ -1,11 +1,11 @@
 version: "3.3"
 services:
   nginx:
-    image: quay.io/azavea/districtbuilder-nginx:${TRAVIS_COMMIT}
+    image: quay.io/azavea/districtbuilder-nginx:${GIT_COMMIT}
   django:
-    image: quay.io/azavea/districtbuilder-app:${TRAVIS_COMMIT}
+    image: quay.io/azavea/districtbuilder-app:${GIT_COMMIT}
   geoserver:
-    image: quay.io/azavea/districtbuilder-geoserver:${TRAVIS_COMMIT}
+    image: quay.io/azavea/districtbuilder-geoserver:${GIT_COMMIT}
   terraform:
     build: 
       context: ./deployment
