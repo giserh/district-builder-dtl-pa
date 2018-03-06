@@ -99,9 +99,7 @@ variable "app_server_instance_type" {
 
 variable "app_server_availability_zone" {}
 
-variable "route53_public_zone_name" {
-  default = "districtbuilder.azavea.com"
-}
+variable "route53_public_zone_name" {}
 
 variable "route53_private_zone_name" {
   default = "internal.districtbuilder.com"
