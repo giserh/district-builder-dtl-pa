@@ -6,6 +6,10 @@ variable "environment" {
   default = "Staging"
 }
 
+variable "state_name" {
+  description = "Name of the state for this DistrictBuilder Deployment (e.g. PA, Ohio)"
+}
+
 variable "aws_region" {
   default = "us-east-1"
 }

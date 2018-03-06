@@ -7,6 +7,7 @@ resource "aws_db_subnet_group" "default" {
     Name        = "dbsngDatabaseServer"
     Project     = "${var.project}"
     Environment = "${var.environment}"
+    State       = "${var.state_name}"
   }
 }
 
@@ -70,6 +71,7 @@ resource "aws_db_parameter_group" "default" {
     Name        = "dbpgDatabaseServer"
     Project     = "${var.project}"
     Environment = "${var.environment}"
+    State       = "${var.state_name}"
   }
 }
 

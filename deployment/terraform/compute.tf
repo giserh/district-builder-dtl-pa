@@ -6,6 +6,7 @@ resource "aws_security_group" "app_server" {
   tags {
     Environment = "${var.environment}"
     Project     = "${var.project}"
+    State       = "${var.state_name}"
   }
 }
 
@@ -92,6 +93,7 @@ resource "aws_instance" "app_server" {
   tags {
     Project     = "${var.project}"
     Environment = "${var.environment}"
+    State       = "${var.state_name}"
   }
 }
 
@@ -127,6 +129,7 @@ resource "aws_security_group" "app_server_alb" {
   tags {
     Environment = "${var.environment}"
     Project     = "${var.project}"
+    State       = "${var.state_name}"
   }
 }
 
@@ -143,6 +146,7 @@ resource "aws_alb" "app_server" {
     Name        = "albAppServer"
     Project     = "${var.project}"
     Environment = "${var.environment}"
+    State       = "${var.state_name}"
   }
 }
 
@@ -167,6 +171,7 @@ resource "aws_alb_target_group" "app_server_http" {
     Name        = "tg${var.environment}HTTPAppServer"
     Project     = "${var.project}"
     Environment = "${var.environment}"
+    State       = "${var.state_name}"
   }
 }
 
