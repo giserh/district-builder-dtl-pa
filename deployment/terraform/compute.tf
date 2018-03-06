@@ -112,6 +112,9 @@ resource "null_resource" "provision_app_server" {
     command = <<SCRIPT
 # Setup SSH agent, update known hosts file
 eval $(ssh-agent)
+ls ~/.ssh
+chmod -R 0600 ~/.ssh
+chown -R $(whoami) ~/.ssh
 ssh-add ~/.ssh/district-builder.pem
 ssh-keyscan -H "${aws_route53_record.bastion.fqdn}"
 ssh ubuntu@${aws_route53_record.bastion.fqdn} "ssh-keyscan -H app-server.districtbuilder.internal; cat ~/.ssh/known_hosts" >> ~/.ssh/known_hosts
