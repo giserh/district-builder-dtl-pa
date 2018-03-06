@@ -46,8 +46,10 @@ data "template_file" "ansible_variables" {
     database_password = "${var.rds_database_password}"
     database_user = "${var.rds_database_username}"
     redis_password = "${var.districtbuilder_redis_password}"
-    geoserver_user = "${var.districtbuilder_geoserver_user}"
     geoserver_password = "${var.districtbuilder_geoserver_password}"
+    mailer_host = "${var.districtbuilder_mailer_host}"
+    mailer_user = "${var.districtbuilder_mailer_user}"
+    mailer_password = "${var.districtbuilder_mailer_password}"
   }
 }
 

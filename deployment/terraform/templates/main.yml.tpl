@@ -15,5 +15,7 @@ districtbuilder_database_password: ${database_password}
 districtbuilder_database_name: ${database_name}
 districtbuilder_database_user: ${database_user}
 districtbuilder_redis_password: ${redis_password}
-districtbuilder_geoserver_user: ${geoserver_user}
 districtbuilder_geoserver_password: ${geoserver_password}
+districtbuilder_mailer_host: ${mailer_host}
+districtbuilder_mailer_user: ${mailer_user}
+districtbuilder_mailer_password: ${mailer_password}

@@ -110,6 +110,8 @@ variable "districtbuilder_admin_user" {}
 variable "districtbuilder_admin_email" {}
 variable "districtbuilder_admin_password" {}
 variable "districtbuilder_redis_password" {}
-variable "districtbuilder_geoserver_user" {}
 variable "districtbuilder_geoserver_password" {}
 variable "districtbuilder_image_version" {}
+variable "districtbuilder_mailer_host" {}
+variable "districtbuilder_mailer_user" {}
+variable "districtbuilder_mailer_password" {}
