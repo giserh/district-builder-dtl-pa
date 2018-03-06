@@ -110,10 +110,13 @@ resource "null_resource" "provision_app_server" {
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-cex"]
     command = <<SCRIPT
+# Setup SSH agent, update known hosts file
 eval $(ssh-agent)
 ssh-add ~/.ssh/district-builder.pem
 ssh-keyscan -H "${aws_route53_record.bastion.fqdn}"
 ssh ubuntu@${aws_route53_record.bastion.fqdn} "ssh-keyscan -H app-server.districtbuilder.internal; cat ~/.ssh/known_hosts" >> ~/.ssh/known_hosts
+
+# Run ansible provisioner
 pushd ${path.root}/../ansible
 ansible-galaxy install -r roles.yml -p roles/
 aws ec2 wait instance-running --instance-ids=${aws_instance.app_server.id} --region=${var.aws_region}
