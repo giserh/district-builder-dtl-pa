@@ -32,6 +32,7 @@ import json
 import logging
 import os
 import re
+import time
 import traceback
 import types
 from datetime import datetime, timedelta, tzinfo
@@ -65,6 +66,25 @@ from redistricting.models import (
 import requests
 
 logger = logging.getLogger(__name__)
+
+
+def retry(num_retries, interval_in_sec):
+    def decorator_func(func):
+        """
+        Decorator to call a function some number of times until it returns a
+        truthy value.
+        """
+        def new_func(*args, **kwargs):
+            result = False
+            for index in range(num_retries):
+                result = func(*args, **kwargs)
+                if result or index == num_retries - 1:
+                    break
+                else:
+                    time.sleep(interval_in_sec)
+            return result
+        return new_func
+    return decorator_func
 
 
 def check_and_update(a_model,
@@ -1081,10 +1101,10 @@ class SpatialUtils:
         @returns: A flag indicating if the configuration was purged successfully.
         """
         # Delete workspace
-        if not self._rest_config(
+        if not self._retry_rest_config(
                 'DELETE', '/geoserver/rest/workspaces/%s.json?recurse=true' % self.ns):
-            logger.debug("Could not delete workspace %s", self.ns)
-            return False
+            logger.info("Could not delete workspace %s", self.ns)
+            logger.info("This workspace may not currently exist. Continuing purge...")
 
         # Get a list of styles
         sts_cfg = self._read_config('/geoserver/rest/styles.json',
@@ -1102,9 +1122,9 @@ class SpatialUtils:
 
                 # Delete the style
                 if not self._rest_config('DELETE', st_cfg['href']):
-                    logger.debug("Could not delete style %s", st_cfg['name'])
+                    logger.info("Could not delete style %s", st_cfg['name'])
                 else:
-                    logger.debug("Deleted style %s", st_cfg['name'])
+                    logger.info("Deleted style %s", st_cfg['name'])
 
         return True
 
@@ -1619,6 +1639,14 @@ class SpatialUtils:
         except requests.exceptions.RequestException:
             return False
 
+    # Keep retrying the API request a set number of times.
+    # This is necessary because Geoserver will periodically return
+    # [Errno 111] Connection refused
+    # due to some timing issue.
+    @retry(num_retries=5, interval_in_sec=10)
+    def _retry_rest_config(self, *args, **kwargs):
+        return self._rest_config(*args, **kwargs)
+
     def _rest_config(self, method, url, data=None, headers=None):
         """
         Configure a REST resource. This issues an HTTP POST or PUT request
@@ -1640,15 +1668,16 @@ class SpatialUtils:
             rsp.read()  # and discard
             conn.close()
             if rsp.status != 201 and rsp.status != 200:
-                logger.debug('HTTP Status: %d, %s %s' % (
+                logger.error('HTTP Status: %d, %s %s' % (
                     rsp.status,
                     method,
                     url,
                 ))
-                logger.debug(data)
+                if data:
+                    logger.error(data)
                 return False
-        except Exception as ex:
-            logger.debug(ex)
+        except Exception:
+            logger.exception("Request failed")
             return False
 
         return True
