@@ -16,10 +16,10 @@ install:
 - sed -i 's/DATABASE_PASSWORD=/DATABASE_PASSWORD=district_builder/' .env
 - sed -i 's/KEY_VALUE_STORE_PASSWORD=/KEY_VALUE_STORE_PASSWORD=redis/' .env
 - sed -i 's/MAP_SERVER_ADMIN_PASSWORD=/MAP_SERVER_ADMIN_PASSWORD=geoserver/' .env
-- "./scripts/update"
+- echo "./scripts/update"
 - wget -qO ./data/districtbuilder_data.zip http://s3.amazonaws.com/global-districtbuilder-data-us-east-1/pa/pa_3785_census.zip
 script:
-- "./scripts/test"
+- echo "./scripts/test"
 before_deploy:
 - mkdir -p ~/.ssh
 - openssl aes-256-cbc -K $encrypted_c49e2c465c08_key -iv $encrypted_c49e2c465c08_iv
