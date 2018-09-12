@@ -33,7 +33,7 @@ deploy:
   script: DB_SETTINGS_BUCKET=${PROD_DB_SETTINGS_BUCKET} DB_DOCKER_HOST=${PROD_DB_DOCKER_HOST} scripts/deploy | tee deployment.log
   on:
     repo: azavea/district-builder-dtl-pa
-    branch: master
+    branch: tnation/prod-deploy
 - provider: script
   skip_cleanup: true
   script: scripts/deploy | tee deployment.log
