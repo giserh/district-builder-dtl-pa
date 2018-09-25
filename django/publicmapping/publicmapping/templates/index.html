@@ -1,0 +1,385 @@
+{% comment %}
+
+   Copyright 2010 Micah Altman, Michael McDonald
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+   This file is part of The Public Mapping Project
+   https://github.com/PublicMapping/
+
+   Purpose:
+       This file is a template for the administrative interface.
+
+       This template changes the title of the application and some copy
+       text to customize the text in the administrative section.
+
+   Author:
+        Andrew Jennings, David Zwarg, Kenny Shepard
+
+{% endcomment %}
+{% load i18n static %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="{{ language_code }}">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+    <meta name="author" content="David Zwarg, Andrew Jennings, Kenny Shepard" />
+    <meta name="copyright" content="&copy; 2010 Micah Altman, Michael McDonald"/>
+    <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="DistrictBuilder: Web-based Open Source Software for Collaborative Redistricting" />
+    <meta property="og:description" content="Draw your own redistricting map by visiting the DistrictBuilder website." />
+    <meta property="og:image" content="{% static 'images/db_sprite.png' %}"/>
+
+    <title>{% trans "Welcome to DistrictBuilder" %}</title>
+    <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}?dtl" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/reset.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'jquery/themes/custom-theme/jquery-ui.custom.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/core.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/visuals.css' %}" />
+    <script src="https://use.typekit.net/vgz6hbo.js"></script>
+    <script>try{Typekit.load({ async: false });}catch(e){}</script>
+    {% if rollbar_client_token and not debug %}
+    <!-- Rollbar -->
+    <script type="text/javascript">
+      var _rollbarConfig = {
+          accessToken: "{{ rollbar_client_token }}",
+          captureUncaught: true,
+          captureUnhandledRejections: true,
+          payload: {
+              environment: "production"
+          }
+      };
+      {% include "rollbar_snippet.js" %}
+    </script>
+    {% endif %}
+    {% comment %}
+
+    Load Google Analytics Script if the ga_account has been set
+
+    {% endcomment %}
+    {% if ga_account %}
+        <script type="text/javascript">
+          var _gaq = _gaq || [];
+          _gaq.push(['_setAccount', '{{ ga_account }}']);
+          {% if ga_domain %}
+          _gaq.push(['_setDomainName', '{{ ga_domain }}']);
+          {% endif %}
+          _gaq.push(['_trackPageview']);
+
+          (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+          })();
+        </script>
+    {% endif %}
+    <script type="text/javascript">
+        var opensessions = {% if opensessions %}{{ opensessions }}{% else %}0{% endif %},
+            openusername = '{{ user.username }}',
+            availsession = {% if sessionavail %}true{% else %}false{% endif %};
+    </script>
+
+    <!-- Heap analytics snippet -->
+    <script type="text/javascript">
+      window.heap=window.heap||[],heap.load=function(e,t){window.heap.appid=e,window.heap.config=t=t||{};var r=t.forceSSL||"https:"===document.location.protocol,a=document.createElement("script");a.type="text/javascript",a.async=!0,a.src=(r?"https:":"http:")+"//cdn.heapanalytics.com/js/heap-"+e+".js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(a,n);for(var o=function(e){return function(){heap.push([e].concat(Array.prototype.slice.call(arguments,0)))}},p=["addEventProperties","addUserProperties","clearEventProperties","identify","resetIdentity","removeEventProperty","setEventProperties","track","unsetEventProperty"],c=0;c<p.length;c++)heap[p[c]]=o(p[c])};
+      heap.load("304904070");
+    </script>
+  </head>
+  <body id="static">
+   <div class="static_wrap">
+     {% include "facebook_sdk.html" %}
+
+   <div id="static_header">
+      <img style="height: 34px; margin-top: 8px" src="{% static 'images/title-app.png' %}" />
+      <div id="site_nav">
+        <ul>
+
+        <!--
+          <li><a href="">item</a></li>
+       -->
+          <li><a target="_blank" href="https://drawthelinespa.org/about-us/">{% trans "About" %}</a></li>
+          <li><a target="_blank" href="https://drawthelinespa.org/uploads/attachments/cjlqnt1vh01rwctr34ke5te93-db-districtbuilder-user-guide-2018-09.pdf">{% trans "Support" %}</a></li>
+          <li>
+            {% include "language_chooser.html" %}
+          </li>
+        </ul>
+      </div>
+      <div class="clear"></div>
+    </div>
+
+    <div id="banner">
+       <img src="{{ banner_image }}" />
+    </div>
+
+    <div id="body_box">
+      <div id="tour_news">
+        <div id="news">
+          <h3>Draw your own map with help from the links below.</h3>
+          <h4 style="font-size: 18px; font-weight: 600; margin-bottom: 21px; margin-top: 24px;">Resources</h4>
+          <ul>
+            <li><a target="_blank" href="https://drawthelinespa.org/uploads/attachments/cjlqnt1vh01rwctr34ke5te93-db-districtbuilder-user-guide-2018-09.pdf">{% trans "How to Draw a Map" %}</a></li>
+            <li><a target="_blank" href="https://drawthelinespa.org/uploads/attachments/cjlqoibxz01vjctr3dpmvfzz8-competition-dtlrules-2018-09.pdf">{% trans "DTL Competition Guide" %}</a></li>
+            <li><a target="_blank" href="https://drawthelinespa.org/draw-a-map/districtbuilder-map-tool-user-forum">{% trans "DTL Users Forum" %}</a></li>
+            <li><a target="_blank" href="https://drawthelinespa.org/about-us/what-is-draw-the-lines-pa">{% trans "Frequently Asked Questions" %}</a></li>
+          </ul>
+        </div>
+
+        <ul class="share-buttons">
+          <li class="twitter-tweet">
+            <a href="https://twitter.com/intent/tweet"
+              data-text="I'm drawing a voting map for Draw the Lines PA. Join me! @drawthelinespa #SlaytheGerrymander"
+              class="twitter-share-button">
+              {% trans "Tweet" %}
+            </a>
+            <script type="text/javascript" src="https://platform.twitter.com/widgets.js"></script>
+          </li>
+
+          <li class="facebook-like">
+            <div
+              class="fb-share-button"
+              data-href="{{ request.build_absolute_uri }}"
+              data-text="I'm drawing a voting map for Draw the Lines PA. Join me! @drawthelinespa #SlaytheGerrymander"
+              data-layout="button_count"
+              data-size="small"
+              data-mobile-iframe="true">
+                <a target="_blank"
+                  href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_url|urlencode }}&amp;src=sdkpreparse"
+                  class="fb-xfbml-parse-ignore">{% trans "Share" %}
+                </a>
+            </div>
+          </li>
+
+          <li class="email-share">
+            <a id="email-share-link">
+              <button id="email-share-button"><img id="email-share-img" src="{% static 'images/icon-mail.png' %}"></button>
+            </a>
+          </li>
+
+          <script type="text/javascript">
+            var mailLink = 'mailto:?subject=I%27m%20drawing%20a%20voting%20map%20for%20Draw%20the%20Lines%20PA.%20Join%20me!%20%40drawthelinespa%20%23SlaytheGerrymander&body=' + window.location.href;
+            document.getElementById('email-share-link').setAttribute('href', mailLink);
+          </script>
+        </ul>
+
+      </div>
+
+      <div id="user">
+
+        <div id="login">
+          <form action="/accounts/login/" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="/districtmapping/plan/0/view/"/>
+            <h3>{% trans "Log In" %}</h3>
+<input id="username" name="username"/>
+<input id="passphrase" type="password"/>
+<input id="password" name="password" type="hidden"/>
+<button id="login" type="submit" />{% trans "Login" %}</button>
+          </form>
+<p><a href="#" onclick="$('#forgotpass').dialog('open');">{% trans "Forgot your password?" %}</a></p>
+
+          </div>
+
+        <div id="signup">
+          <h3>{% trans "Don't have an account?" %}</h3>
+
+          <h4>{% trans "To Draw Your Own Maps..." %}</h4>
+
+          <button  onclick="$('#register').dialog('open');" id="sign_up" />{% trans "Sign Up" %}</button>
+
+          <h4>{% trans "To View Other Users' Maps..." %}</h4>
+
+          <form id="anonymousForm" action="/accounts/register/" method="post">
+              {% csrf_token %}
+              <button id="doAnonymous" id="enter_as_a_guest" />{% trans "Enter as a guest" %}</button>
+
+            </form>
+
+            <p>
+            <a href="#" onclick="$('#privacy').dialog('open');">{% trans "Terms of Use" %}</a>
+            </p>
+
+
+        </div>
+        <div class="clear_left"></div>
+      </div>
+    </div>
+    {% include "account.html" %}
+    <div id="forgotpass">
+        <form id="forgotForm" action="/accounts/hint/" method="POST">
+            {% csrf_token %}
+            <div id="forgotprompt">
+                <div id="username_hint">{% trans "Get A Hint" %}</div>
+                <div>
+                    Enter your username and email address to get your password hint.
+                </div>
+                <p>&nbsp;</p>
+                <table class="forgotTable">
+                    <tr>
+                        <td class="fname">{% trans "Username" %}</td>
+                        <td><input id="forgotusername" name="forgotusername" class="field" maxlength="30"/></td>
+                    </tr>
+                </table>
+                <table class="forgotTable">
+                    <tr>
+                        <td class="fname">{% trans "Email" %}</td>
+                        <td><input id="forgotemail" name="forgotemail" class="field"/></td>
+                    </tr>
+                </table>
+            </div>
+            <div id="forgotButton">
+                <button id="doRemind">{% trans "Get Hint" %}</button>
+            </div>
+
+            <div id="forgothint">
+                <div id="got_hint">{% trans "Here Is Your Hint" %}</div>
+                <p>{% trans "If this helps you remember your password, you can close this dialog and log in." %}</p>
+
+                <input id="forgothintbox" name="forgothintbox" class="field"/>
+
+                <p>{% trans "If you still can't recall your password, click on the 'Reset Password' button so we can reset and email your password to you." %}</p>
+
+            </div>
+            <div id="forgotsent">
+                <div id="reset_sent">{% trans "Email Sent" %}</div>
+                <p>{% trans "Your password has been emailed to you. You should receive your password in your inbox in the next few minutes." %}</p>
+            </div>
+            <div id="forgotButton2">
+                <button id="doReset">{% trans "Reset Password" %}</button>
+                <button id="doClose">{% trans "Close" %}</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="sessiondupe">
+        <h1>{% trans "Your account has too many sessions." %}</h1>
+        <p>{% trans "To use DistrictBuilder, you must do one of the following actions:" %}</p>
+        <ul>
+            <li>
+                <a href="#" id="different_login">{% trans "Log in as a different user." %}</a>
+            </li>
+            <li>
+                <a href="/accounts/logout/?next=/districtmapping/plan/0/view/">{% trans "Use the system as a guest." %}</a>
+            </li>
+            <li>
+                <form method="post" id="purge_form" action="session/">
+                    <input type="hidden" id="purge_username" name="username" value="{{ user.username }}"/>
+                    <a href="#" id="force_close">{% trans "Force close the other user's session and log in again." %}</a>
+                </form>
+            </li>
+        </ul>
+    </div>
+
+    <div id="sessionsmax">
+        <p>{% trans "The DistrictBuilder application has reached maximum capacity. Please try to use the application again shortly. We apologize for the inconvenience." %}</p>
+    </div>
+
+    <div id="privacy">                <h4 class="first">{% trans "The following discloses our information gathering and dissemination practices; and terms of use for this web site." %}</h4>
+        <h4>{% trans "Information gathering" %}</h4>
+        <ul>
+          <li>{% trans "Our web server software generates logfiles of the IP addresses of computers that access this web site and of what files they access." %}</li>
+          <li>{% trans "These web server logs are retained on a temporary basis and then deleted completely from our systems." %}</li>
+          <li>{% trans "We also may ask our visitors to provide information about themselves." %}</li>
+          <li>{% trans "We may use cookies to maintain a user's identity between web sessions." %}</li>
+        </ul>
+        <h4>{% trans "Contributor Terms" %}</h4>
+        <p>{% trans "This site enables users to create districting maps and to comment on the maps of others.  By creating a map, a comment, or an account, you are agreeing to the following terms for any map, comment, data, or other content (collectively, 'Contents') you contribute to this site. " %}</p>
+        <p>{% trans "You hereby grant to us a worldwide, royalty-free, non-exclusive, perpetual, irrevocable license to do any act that is restricted by copyright over anything within the Contents, whether in the original medium or any other. These rights explicitly include commercial use, and do not exclude any field of endeavour. These rights include, without limitation, the right to sublicense the work through multiple tiers of sublicensees. To the extent allowable under applicable local laws and copyright conventions, You also waive and/or agree not to assert against us or our licensees any moral rights that You may have in the Contents." %}</p>
+        <p>{% trans "We agree to make the Contents that you contribute and designate as &quot;published&quot; available under at least one of the following licenses: ODbL 1.0; DbCL 1.0; CC-BY-SA 2.0; or another free and open license. " %}</p>
+        <h4>{% trans "Use of information" %}</h4>
+        <p>{% trans "We use third parties to provide processing functions on our site. When you register for  services, we may share information as necessary for the third party to provide those services.  We make commercially reasonable efforts to ensure that these third parties are prohibited from using your personally identifiable information for any other purpose. " %}</p>
+        <p>{% trans "We use your IP address and files you access to help diagnose problems with our server and to administer our Web site by identifying (1) which parts of our site are most heavily used, and (2) which portion of our audience comes from different geographical regions. We also use this information to tailor site content to user needs, and to generate aggregate statistical reports. At no time do we disclose site usage by individual visitors." %}</p>
+        <p>{% trans "We reserve the right to disclose your personally identifiable information as required by law and when we believe that disclosure is necessary to protect our rights and/or to comply with a judicial proceeding, court order or legal process served on the hosts. " %}</p>
+        <p>{% trans "All maps created through the system, edits to those maps, and comments made on those maps are associated with an account id and a timestamp. These maps, comments, account id's and timestamps may be made available to the public.  We may use this information to generate aggregate statistical reports. At no time do we disclose the name, e-mail or other identifying information associated with individual users accounts, unless the individual explicitly selects the &quot;make my account information public&quot; settings in the users profile setting. " %}</p>
+        <h4>{% trans "Security" %}</h4>
+        <p>{% trans "This site has security measures in place to protect the loss, misuse and alteration of the information under our control." %}</p>
+        <h4>{% trans "Contacting this web site" %}</h4>
+        <p>{% trans "If you have any questions about this privacy statement, the practices of this site, or your dealings with this site, you can contact the support address at the host domain" %}</a>. {% trans "This web site may contain links to other web sites. We are not responsible for the privacy practices or the content of such web sites." %}</p>
+        <h4>{% trans "Changes to this policy" %}</h4>
+        <p>{% trans "An announcement of any changes to this policy will be posted on this page for  thirty days before any changes go into effect." %}</p>
+        <h4>{% trans "Effective Date" %}</h4>
+        <p>{% trans "The effective date of this policy was May 2, 2011." %}</p>
+    </div>
+
+    <div id="footer">
+      <!-- Uncomment to display Creative Commons License
+      <div class="attribution">
+        <a class="logoLeft" rel="license" href="http://creativecommons.org/licenses/by/3.0/">
+          <img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/3.0/88x31.png" />
+        </a>
+      </div>
+      -->
+
+      {% comment %}
+      ATTRIBUTION NOTICE SECTION
+
+      Under section 4.3 of the license following section may not be altered
+      without the express written permission of the copyright holders.
+      {% endcomment %}
+      <div class="attribution">
+        <!-- Keep this on one line to avoid an underscore in Chrome -->
+        <a target="_blank" href="http://www.districtbuilder.org"><img alt="{% trans "Powered By DistrictBuilder" %}" src="{% static 'images/db_sprite.png' %}"></a>
+
+        <a target="_blank" href="http://www.azavea.com"><img style="height: 24px; margin-right: 16px;" alt="Built by Azavea" src="{% static 'images/azavea-logo.png' %}"></a>
+
+        <!-- Heap badge program, see: https://heapanalytics.com/badge -->
+        <a href="https://heapanalytics.com/?utm_source=badge" rel="nofollow"><img style="width:108px;height:41px" src="//heapanalytics.com/img/badgeLight.png" alt="Heap | Mobile and Web Analytics" /></a>
+
+      </div>
+      {% comment %}
+      ATTRIBUTION NOTICE SECTION ENDS
+      {% endcomment %}
+
+      <div id="sponsors">
+      </div>
+    </div>
+
+    </div>
+    <script type="text/javascript" src="{% static 'jquery/jquery-1.6.2.min.js' %}"></script>
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+    <script type="text/javascript" src="{% static 'jquery/jquery-ui-1.8.16.custom.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'jquery/external/jquery.bgiframe-2.1.1.js' %}"></script>
+    <script type="text/javascript" src="{% static 'jquery/external/jquery.tools.tooltip.slide.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/ui.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/register.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/sha1.js' %}"></script>
+    <script type="text/javascript">
+      $('button#login').click(function(event){
+          var un = $('#username'),
+              pp = $('#passphrase'),
+              pw = $('#password');
+
+          $('#username, #passphrase').removeClass('error');
+
+          if ($.trim(un.val()) == '' || $.trim(pp.val()) == '') {
+              $('<div class="error">Please enter user name and password.</div>').dialog({
+                  modal:true,
+                  width:300,
+                  resizable:false,
+                  title:'Login Error'
+              });
+              if ($.trim(un.val()) == '') {
+                  $('#username').addClass('error');
+              }
+              if ($.trim(pp.val()) == '') {
+                  $('#passphrase').addClass('error');
+              }
+              event.stopPropagation();
+              return false;
+          }
+
+          pw.val( Sha1.hash(pp.val() ) );
+      });
+    </script>
+  </body>
+</html>

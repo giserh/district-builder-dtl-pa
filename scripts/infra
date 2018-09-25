@@ -1,0 +1,103 @@
+#!/bin/bash
+
+set -e
+
+if [[ -n "${DB_DEBUG}" ]]; then
+    set -x
+fi
+
+set -u
+
+DIR="$(readlink -f "$(dirname "$0")")"
+PROJECT_ROOT=$(dirname "${DIR}")
+DEPLOYMENT_ROOT="${PROJECT_ROOT}/deployment"
+TERRAFORM_DIR="${DEPLOYMENT_ROOT}/terraform"
+
+function usage() {
+    echo -n \
+"Usage: $(basename "$0") COMMAND OPTION[S]
+Execute Terraform subcommands with remote state management.
+"
+}
+
+function wait_for_docker() {
+
+  for i in {1..5}; do
+      if docker-compose ps > /dev/null; then
+        echo 'Docker daemon is running!'
+        return
+      else
+        echo "Docker daemon is not running. $(( 5 - i)) attempts remaining."
+        sleep 5
+      fi;
+  done
+
+  echo 'Error waiting for Docker daemon.'
+  exit 1
+}
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+    if [ "${1:-}" = "--help" ]; then
+        usage
+    else
+        if [[ -n "${DB_SETTINGS_BUCKET}" ]]; then
+
+            pushd "${TERRAFORM_DIR}"
+
+            aws s3 cp "s3://${DB_SETTINGS_BUCKET}/terraform/${DB_STATE}/terraform.tfvars" "${DB_SETTINGS_BUCKET}.tfvars"
+
+            echo
+            echo "Attempting to deploy application version [${IMAGE_VERSION}] for state ${DB_STATE}..."
+            echo "-----------------------------------------------------"
+            echo
+
+            case "${1}" in
+                plan)
+                    rm -rf .terraform terraform.tfstate*
+                    terraform init \
+                              -backend-config="bucket=${DB_SETTINGS_BUCKET}" \
+                              -backend-config="key=terraform/${DB_STATE}/state"
+                    terraform plan \
+                              -var-file="${DB_SETTINGS_BUCKET}.tfvars" \
+                              -var="state=\"${DB_STATE}\"" \
+                              -out="${DB_SETTINGS_BUCKET}.tfplan"
+                    ;;
+                apply)
+
+                    terraform apply "${DB_SETTINGS_BUCKET}.tfplan"
+
+                    pushd "${PROJECT_ROOT}"
+
+                    echo "Configuring TLS for Docker..."
+                    aws s3 cp "s3://${DB_SETTINGS_BUCKET}/terraform/${DB_STATE}/.env" "${PROJECT_ROOT}/.env"
+
+                    mkdir -p "/root/.docker"
+                    aws s3 cp "s3://${DB_SETTINGS_BUCKET}/docker_certs/client/client.zip" "client.zip"
+                    unzip -od "/root/.docker" "client.zip"
+                    rm "client.zip"
+
+                    export DOCKER_TLS_VERIFY=1
+                    export DOCKER_HOST="${DB_DOCKER_HOST}"
+                    export DOCKER_CERT_PATH="/root/.docker"
+
+                    set +e
+                    wait_for_docker
+                    set -e
+
+                    GIT_COMMIT="${IMAGE_VERSION}" ./scripts/update --production
+                    GIT_COMMIT="${IMAGE_VERSION}" ./scripts/server --production
+                    popd
+                    ;;
+                *)
+                    echo "ERROR: I don't have support for that Terraform subcommand!"
+                    exit 1
+                    ;;
+            esac
+
+            popd
+        else
+            echo "ERROR: No DB_SETTINGS_BUCKET variable defined."
+            exit 1
+        fi
+    fi
+fi

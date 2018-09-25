@@ -1,0 +1,38 @@
+upstream web {
+  server django:${WEB_APP_PORT};
+}
+
+upstream geoserver {
+  server geoserver:${WEB_APP_PORT};
+}
+
+server {
+  listen ${WEB_APP_PORT};
+  server_name localhost;
+
+  proxy_set_header Host $http_host;
+
+  # Long timeouts are necessary for extended split reports
+  proxy_read_timeout 300s;
+
+  location / {
+    proxy_pass http://web;
+    client_max_body_size 20M;
+  }
+
+  location /geoserver/ {
+    proxy_pass http://geoserver/geoserver/;
+  }
+
+  location /sld/ {
+    alias /opt/sld/;
+  }
+
+  location /static/ {
+    alias /opt/static/;
+  }
+
+  location /reports/ {
+    alias /opt/reports/;
+  }
+}

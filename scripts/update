@@ -1,0 +1,87 @@
+#!/bin/bash
+
+set -e
+
+if [[ -n "${DB_DEBUG}" ]]; then
+    set -x
+fi
+
+GIT_COMMIT="${GIT_COMMIT:0:7}"
+
+function usage() {
+
+    echo -n \
+"Usage: $(basename "$0")
+Setup project containers and database.
+"
+}
+
+function build_containers() {
+    echo "Building containers"
+    docker-compose build
+}
+
+function run_migrations() {
+    echo "Running migrations"
+    docker-compose \
+        exec -T django ./manage.py migrate
+}
+
+function reconfigure() {
+    echo "Reconfigure"
+    docker-compose \
+        exec -T django ./manage.py setup config/config.xml -f
+}
+
+function write_settings() {
+    # Write config_settings to the filesystem so it doesn't get
+    # overwritten by docker-compose volume mounts
+    docker-compose run --rm --entrypoint "bash -c" django \
+        "python -m district_builder_config.generate_settings \
+            config/config.xsd \
+            config/config.xml \
+            publicmapping/config_settings.py"
+
+}
+
+function make_translations() {
+    echo "Create and compile translations"
+    docker-compose \
+        exec -T django ./manage.py makelanguagefiles
+}
+
+function change_geoserver_admin_password() {
+    docker-compose \
+        exec -T geoserver ./bin/change_admin_password.sh
+}
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]
+then
+    if [ "${1:-}" = "--help" ]
+    then
+        usage
+    else
+        if [ "${1:-}" = "--production" ]
+        then
+          # Make these environment variables available
+          # to docker-compose in production.
+          export COMPOSE_FILE="docker-compose.yml:docker-compose.production.yml"
+          export GIT_COMMIT
+
+          # There's no django container in production
+          MIGRATION_CONTAINERS=("django" "geoserver")
+
+        else
+          MIGRATION_CONTAINERS=("postgres" "django" "geoserver")
+        fi
+
+        build_containers
+        write_settings
+        docker-compose up -d "${MIGRATION_CONTAINERS[@]}"
+        run_migrations
+        reconfigure
+        make_translations
+        change_geoserver_admin_password
+    fi
+    exit
+fi

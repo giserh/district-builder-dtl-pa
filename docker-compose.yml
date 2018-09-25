@@ -1,0 +1,87 @@
+version: "3.3"
+services:
+  redis:
+    env_file:
+      - .env
+    image: redis:3.2-alpine
+    command: redis-server --requirepass ${KEY_VALUE_STORE_PASSWORD}
+    ports:
+     - "${KEY_VALUE_STORE_PORT}:${KEY_VALUE_STORE_PORT}"
+
+  nginx:
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+      args:
+        WEB_APP_PORT: "${WEB_APP_PORT}"
+    ports:
+      - "${WEB_APP_PORT}:${WEB_APP_PORT}"
+    volumes:
+      - sld:/opt/sld/
+      - reports:/opt/reports
+    depends_on:
+      - django
+
+  django:
+    env_file:
+      - .env
+    build:
+      context: ./django/publicmapping
+    expose:
+      - "${WEB_APP_PORT}"
+    volumes:
+      - reports:/opt/reports
+      - sld:/opt/sld
+      - tmp:/tmp
+    entrypoint: /usr/local/bin/gunicorn
+    command:
+      - "--workers=2"
+      - "--timeout=60"
+      - "--bind=0.0.0.0:${WEB_APP_PORT}"
+      - "--reload"
+      - "--log-level=debug"
+      - "--access-logfile=-"
+      - "--error-logfile=-"
+      - "--timeout=300"
+      - "-kgevent"
+      - "publicmapping.wsgi"
+    links:
+      - redis:${KEY_VALUE_STORE_HOST}
+      - geoserver:${MAP_SERVER_HOST}
+
+  celery:
+    build:
+      context: ./django/publicmapping
+    env_file:
+      - .env
+    volumes:
+      - reports:/opt/reports
+      - tmp:/tmp
+    entrypoint: /usr/local/bin/celery
+    command:
+      - "worker"
+      - "--app=publicmapping"
+      - "--uid=reporter"
+      - "--loglevel=INFO"
+      - "--without-mingle"
+    links:
+      - redis:${KEY_VALUE_STORE_HOST}
+
+  geoserver:
+    build:
+      context: ./geoserver
+    env_file:
+      - .env
+    volumes:
+      - data:/data
+      - sld:/data/sld
+    ports:
+      - "${MAP_SERVER_PORT}:${WEB_APP_PORT}"
+
+volumes:
+  reports:
+  data:
+  sld:
+  tmp:

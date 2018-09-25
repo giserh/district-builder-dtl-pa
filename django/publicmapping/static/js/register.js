@@ -135,16 +135,14 @@ $(function(){
             passwordhint.addClass('field');
             passwordhint.removeClass('error');
         }
-        if ($.trim(email.val()) != '') {
-            if (!(email.val().match(/^([\w\-\.\+])+\@([\w\-\.])+\.([A-Za-z]{2,4})$/))) {
-                email.removeClass('field');
-                email.addClass('error');
-                return false;
-            }
-            else {
-                email.addClass('field');
-                email.removeClass('error');
-            }            
+        if (!(email.val().match(/^([\w\-\.\+])+\@([\w\-\.])+\.([A-Za-z]{2,4})$/))) {
+            email.removeClass('field');
+            email.addClass('error');
+            return false;
+        }
+        else {
+            email.addClass('field');
+            email.removeClass('error');
         }
 
         if (agree.length > 0 && !agree[0].checked) {
@@ -175,7 +173,7 @@ $(function(){
                     if (data.success) {
                         if (typeof(_gaq) != 'undefined') { _gaq.push(['_trackEvent', 'Users', 'Registered']); }
                         $('#register').dialog('close');
-                        $('<div />').text(gettext("You've been registered for the public mapping project.")).dialog({
+                        $('<div />').text(gettext("You've been registered for Draw the Lines-PA.")).dialog({
                             modal:true,
                             width:300,
                             title:gettext("Success!"),
@@ -256,15 +254,10 @@ $(function(){
                 remindBtn.attr('disabled',null);
                 remindBtn.html('<span class="ui-button-text">'+btnText+'</span>');
                 if (data.success) {
-
                     if (data.mode == 'hinting') {
                         $('#forgotprompt, #forgotButton').css('display','none');
                         $('#forgothint, #forgotButton2').css('display','block');
                         $('#forgothintbox').val( data.hint );
-                    }
-                    else if (data.mode == 'sending') {
-                        $('#forgotprompt, #forgotButton').css('display','none');
-                        $('#forgotsent, #forgotButton2').css('display','block');
                     }
                 }
                 else if (data.field) {
@@ -274,14 +267,15 @@ $(function(){
                     if (data.field != 'username') {
                         $('#forgotemail').addClass('error');
                     }
+                } else {
+                    $('#forgotusername').val('');
+                    $('#forgotemail').val('');
                 }
             },
             error:function(xhr,textStatus,error){
                 var remindBtn = $('#doRemind');
                 remindBtn.html('<span class="ui-button-text">'+btnText+'</span>');
                 remindBtn.attr('disabled',true);
-            },
-            complete:function(xhr, textStatus){
                 $('#forgotusername').val('');
                 $('#forgotemail').val('');
             }
@@ -290,18 +284,62 @@ $(function(){
         return false;
     });
 
-    // do this operation when a user goes 'back' in the dialog
-    $('#doBack').click(function(){
-        $('#forgotprompt, #forgotButton').css('display','block');
-        $('#forgothint, #forgotsent, #forgotButton2').css('display','none');
+    // do this operation when a user clicks 'Reset Password' in the dialog
+    $('#doReset').click(function(){
+        var frm = $('#forgotForm')[0];
+        $('#forgotusername, #forgotemail').removeClass('error');
+
+        var resetBtn = $('#doReset');
+        resetBtn.attr('disabled',true);
+        var btnText = resetBtn.text();
+        resetBtn.html('<span class="ui-button-text" />').text(gettext('Please Wait...'));
+
+        $.ajax({
+            context:frm,
+            data: {
+                username: $('#forgotusername').val(),
+                email: $('#forgotemail').val(),
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+            },
+            dataType:'json',
+            type:'POST',
+            url:'/accounts/forgot/',
+            success: function(data,textStatus,xhr){
+                var resetBtn = $('#doReset');
+                resetBtn.attr('disabled',null);
+                resetBtn.html('<span class="ui-button-text">'+btnText+'</span>');
+                if (data.success) {
+
+                    if (data.mode == 'sending') {
+                        $('#forgotprompt, #forgotButton').css('display','none');
+                        $('#forgothint, #forgotButton2').css('display','none');
+                        $('#forgotsent, #forgotButton2').css('display','block');
+                        $('#doReset').css('display','none');
+                    }
+                }
+            },
+            error:function(xhr,textStatus,error){
+                var resetBtn = $('#doReset');
+                resetBtn.html('<span class="ui-button-text">'+btnText+'</span>');
+                resetBtn.attr('disabled',true);
+            },
+            complete:function(xhr,textStatus){                
+                $('#forgotusername').val('');
+                $('#forgotemail').val('');
+            }
+        });
+
         return false;
     });
 
     // do this operation when a user closes the dialog
     $('#doClose').click(function(){
+        $('#forgotusername').val('');
+        $('#forgotemail').val('');
         $('#forgotpass').dialog('close');
         $('#forgotprompt, #forgotButton').css('display','block');
         $('#forgothint, #forgotsent, #forgotButton2').css('display','none');
+        $('#doReset').css('display','inline-block');
         return false;
     });
 

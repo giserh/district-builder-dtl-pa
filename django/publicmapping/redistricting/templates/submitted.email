@@ -11,8 +11,8 @@ Context:
 {% autoescape off %}
 {% trans "Hello" %} {{ user.username }},
 
-{% trans "Your plan" %} ("{{ plan.name }}") {% trans "has been successfully submitted. Thank you for your submission." %}
+{% trans "Your Plan" %} ("{{ plan.name }}") {% trans "has been successfully submitted. Thank you for your submission." %}
 
 {% trans "Happy Redistricting!" %}
-{% trans "The Public Mapping Team" %}
+{% trans "The Draw the Lines Team" %}
 {% endautoescape %}

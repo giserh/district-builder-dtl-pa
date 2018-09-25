@@ -14,7 +14,7 @@
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
-   limitations under the License. 
+   limitations under the License.
 
    This file is part of The Public Mapping Project
    https://github.com/PublicMapping/
@@ -29,14 +29,14 @@
        Andrew Jennings, David Zwarg
 
 {% endcomment %}
-{% load i18n %}
+{% load i18n static %}
 
       {% block toolset_history %}
           <button id="history_undo" class="{% if not plan %}disabled{% else %}{% ifequal plan.version 0 %}disabled{% endifequal %}{% endif %}">{% trans "Undo" %}</button>
           <button id="history_redo" class="disabled">{% trans "Redo" %}</button>
           <input id="history_cursor" type="hidden"/>
       {% endblock %}
-      
+
       {% block toolset_tabs %}
         {% with district_label=body_member_long_label|capfirst %}
           <ul class="mapping_tabs">
@@ -45,12 +45,12 @@
                 {% blocktrans %}{{ district_label }} Tools{% endblocktrans %}
                 </a>
             </li>
-          </ul>  
+          </ul>
         {% endwith %}
       {% endblock %}
-      
-      
-          
+
+
+
       {% block toolset_draw %}
       <div class="toolset" id="toolset_draw">
         <div class="toolset_group">
@@ -59,7 +59,7 @@
           <button class="identify_map_tool btntoggle titletip" title="{% trans "Click on a geounit to see its demographic info." %}" >{% trans "Info" %}</button>
           </div>
          </div>
-       
+
 
     {% with district_label=body_member_long_label|capfirst %}
         <div class="toolset_group toolset_group_lg">
@@ -68,7 +68,7 @@
             <button id="rectangle_drawing_tool" title="{% trans "Select by rectangle" %}" class="btntoggle titletip" >{% blocktrans %}Rectangle<br/>Select{% endblocktrans %}</button>
             <button id="polygon_drawing_tool" title="{% trans "Select by drawing a polygon" %}" class="btntoggle titletip">{% trans "Polygon<br/>Select" %}</button>
           </div>
-        </div>  
+        </div>
         <div class="toolset_group toolset_group_lg">
           <div>
             <button id="anchor_tool" class="titletip" title="{% blocktrans %}Enable anchor mode, then select a {{ body_member_long_label }} name to repeatedly assign areas to a {{ body_member_long_label }}{% endblocktrans %}">{% blocktrans with body_member_long_label|capfirst as district_label %}Anchor<br/>{{ district_label }}{% endblocktrans %}</button>
@@ -84,25 +84,25 @@
               {% endifnotequal %}
             </select>
             </div>
-            <button id="dragdrop_tool" class="titletip" title="{% blocktrans %}Select areas on the map then drag them to into a {{ body_member_long_label }} for reassignment{% endblocktrans %}">{% blocktrans %}Click and<br/>Drag{% endblocktrans %}</button>
+            <button id="dragdrop_tool" class="titletip" title="{% blocktrans %}Select areas on the map then drag them into a {{ body_member_long_label }} for reassignment{% endblocktrans %}">{% blocktrans %}Click and<br/>Drag{% endblocktrans %}</button>
           </div>
         </div>
-        <div class="toolset_group toolset_group_lg last">  
+        <div class="toolset_group toolset_group_lg last">
         {% if not plan.is_community %}
           <div id="fix_unassigned">
-            <button id="fix_unassigned_button" class="titletip" title="{% blocktrans %}Perform automated resolution of minor unassigned geographies{% endblocktrans %}">{% blocktrans %}Fix<br/>Unassigned{% endblocktrans %}</button>
+            <button id="fix_unassigned_button" class="titletip" title="{% blocktrans %}Automatically fix small unassigned areas{% endblocktrans %}">{% blocktrans %}Fix<br/>Unassigned{% endblocktrans %}</button>
           </div>
           {% endif %}
 
-          
+
     {% comment %}End of district_label var{% endcomment %}
     {% endwith %}
             {% comment %}
-            
+
             This hidden div is used to style the locked districts.
             This is needed, because the locked legend item does not
             exist before the first district layer is drawn.
-            
+
             {% endcomment %}
             <div class="locked" style="display:none"></div>
         </div>
@@ -134,8 +134,8 @@
           <button id="show_splits_button">{% blocktrans %}Show<br/>Splits{% endblocktrans %}</button>
           <button id="generate_splits_report_button">{% blocktrans %}Generate<br/>Splits Report{% endblocktrans %}</button>
          </div>
-        
-        <div class="toolset_group toolset_group_lg last">       
+
+        <div class="toolset_group toolset_group_lg last">
           {% if plan.legislative_body.multi_members_allowed %}
           <button id="multi_member_toggle">{% blocktrans %}Select Multi-<br/>Member Districts{% endblocktrans %}</button>
           {% endif %}
@@ -144,53 +144,36 @@
       </div>
       {% endwith %}
       {% endblock %}
-      
-        {% block share_panel %}
-            {% if allow_email_submissions and not plan.is_community %}
-            <div id="emailplan">
-                <div>
-                    <h3>{% trans "Submit Final Plan to Contest" %}</h3>
-                    <p>{% trans "You can submit your completed plan to be considered for the contest by filling out this form." %}</p>
-                    <button id="btnEmailPlan">{% trans "Submit Final Plan" %}</button>
-                </div>
-            </div>
-            {% endif %}
-
-            <div class="explanation">
-                <h3>{% trans "Share Plan With All Users" %}</h3>
-                <p>{% blocktrans %}By sharing a copy of your {{ plan_text }} below, you are making your {{ plan_text }} available to all other users in the system. Give your {{ plan_text }} a unique name in order to share it. A copy of your current {{ plan_text }} will be added to the "Shared" section of the plan chooser.{% endblocktrans %}</p>
-                <div>
-                    <h3>{% blocktrans %}Name your shared {{ plan_text }}{% endblocktrans %}</h3>
-                    <input id="txtPlanName" />
-                    <button id="btnSaveAndShare">{% trans "Save and Share" %}</button>
-                </div>
-            </div>
-
-            <div id="successfulShare" title="{% trans "Congratulations!" %}" >
-                <p>{% blocktrans %}You have successfully shared your {{ plan_text }}. You can share your {{ plan_text }} with others by giving them this link:{% endblocktrans %}</p>
-                <p id="sharedPermalink"><p>
-                <button id="continueEditing">{% blocktrans with plan_text|title as plantext %}Continue Editing Current {{ plantext }}{% endblocktrans %}</button>
-                <a href="/districtmapping/plan/0/view/"><button id="selectNew">{% blocktrans with plan_text|title as plantext %}Select New {{ plan_text }} to Edit{% endblocktrans %}</button></a>
-            </div>
-        {% endblock %}
 
     {% block verify_submit %}
         {% if has_leaderboard and not plan.is_community %}
-        <div id="verifyandpost">
-            <div class="explanation">
-               <h3>{% trans "Verify and Submit Plan to Leaderboards" %}</h3>
-                <p>{% trans 'In order to be considered for placement on the leaderboards your plan must meet the criteria for creating a legal redistricting plan. Keep in mind that as soon as you edit a verified plan, it will automatically become "unverified" and you will need to re-verify it in order for it to again be considered for the leaderboards.' %}</p>
-                <p>{% blocktrans %}By verifying your plan, you are <em><strong>not</strong></em> sharing your plan with other users. Your plan title and user name will simply show up in the top ten lists (if your plan ranks in the top ten).{% endblocktrans %}</p>
-                <p>
-                {% trans "How to verify and submit your plan:" %}
-                <ol>
-                  <li>{% trans 'Click the "Verify and Submit to Leaderboards" button.' %}</li>
-                  <li>{% trans "If verified, you will be taken to the Leaderboard page." %}</li>
-                  <li>{% trans "Check the leaderboards to see if your plan ranks in any of the top ten score types." %}</li>
-                </ol>
-                </p>
+        <div id="sharepageleft">
+            <div id="verifyandpost">
+                <div class="explanation">
+                   <h2>1. Check your map</h2>
+                    <p>Start here to check if your map is constitutional based on contiguity and population.</p>
+                    <p>Once your map is validated, it’s ready to submit to the contest.</p>
+                </div>
+                <p id="verifiedp" class="{% if not plan.is_valid %}hiddenelem{% endif %}"><img id="validatedimg" src="/static/images/icon-verified.png">Validated</p>
+                <button id="btnVerifyAndSubmit" class="{% if plan.is_valid %}hiddenelem{% endif %}">Validate</button>
             </div>
-            <button id="btnVerifyAndSubmit">{% trans "Verify and Submit Plan to Leaderboards" %}</button>            
+            <div id="submittocontest" class="{% if not plan.is_valid %}inactivebox{% endif %}">
+                <div class="explanation">
+                    <h2>2. Submit your map to Draw the Lines</h2>
+                    <p>When you’re ready, submit your map to the Draw the Lines contest here.</p>
+                    <p>(NOTE: Once you press Submit on the form, your submission to the contest is final and can't be changed.  But you can continue to play around with your map!)</p>
+                </div>
+                <button id="btnEmailPlan" class="{% if not plan.is_valid %}hiddenelem{% endif %}">Submit</button>
+            </div>
+        </div>
+        <div id="sharepageright">
+            <div class="explanation">
+                <h3>Did you know?</h3>
+                <ul>
+                    <li>You can see how your map stacks up against others by checking out the Leaderboards page.</li>
+                    <li>If you want to make changes to your map, just use the button at the top to head back to the Map page.</li>
+                </ul>
+            </div>
         </div>
         {% endif %}
     {% endblock %}
@@ -218,7 +201,7 @@
                 <div id="shared_districts_pager"></div>
             </div>
             <div id="shared_district_maps">
-               
+
                <div id="shared_district_map_div"></div>
                <p><strong>{% blocktrans %}Click on a {{ body_member_long_label }}'s name to see a map{% endblocktrans %}</strong></p>
             </div>
@@ -323,40 +306,186 @@
         <table id="emailTable">
             <tr>
                 <td class="fname">{% trans "First Name" %} *</td>
-                <td><input name="first name" class="field required" maxlength="30" value="{{ userinfo.firstname }}" /></td>
+                <td><input name="first_name" class="field required" maxlength="30" value="{{ userinfo.firstname }}" /></td>
             </tr>
             <tr>
                 <td class="fname">{% trans "Last Name" %} *</td>
-                <td><input name="last name" class="field required" maxlength="30" value="{{ userinfo.lastname }}" /></td>
-            </tr>
-            <tr>
-                <td class="fname">{% trans "Full Names of Team Members (if applicable)" %}</td>
-                <td><input name="team members" class="field" maxlength="120" /></td>
+                <td><input name="last_name" class="field required" maxlength="30" value="{{ userinfo.lastname }}" /></td>
             </tr>
             <tr>
                 <td class="fname">{% trans "Team Name (if applicable)" %}</td>
-                <td><input name="team name" class="field" maxlength="120" /></td>
+                <td><input name="team_name" class="field" maxlength="120" /></td>
+            </tr>
+            <tr>
+                <td class="fname">{% trans "Full Names of Team Members (if applicable)" %}</td>
+                <td><input name="team_member_names" class="field" maxlength="400" /></td>
+            </tr>
+            <tr>
+                <td class="fname">{% trans "School/Organization (if applicable)" %}</td>
+                <td><input name="organization_name" class="field" maxlength="120" /></td>
             </tr>
             <tr>
                 <td class="fname">{% trans "Email Address" %} *</td>
-                <td><input name="email" class="field required" maxlength="75" value="{{ userinfo.email }}" /><br/>
-            </tr>
-            <tr>
-                <td class="fname">{% trans "Street Address" %} *</td>
-                <td><input name="street address" class="field required" maxlength="120" /></td>
+                <td><input name="email_address" class="field required" maxlength="75" value="{{ userinfo.email }}" /><br/>
             </tr>
             <tr>
                 <td class="fname">{% trans "Phone Number" %} *</td>
-                <td><input name="phone number" class="field required" maxlength="20" /></td>
+                <td><input name="phone_number" class="field required" maxlength="20" /></td>
+            </tr>
+            <tr>
+                <td class="fname">{% trans "County" %} *</td>
+                <td>
+                    <select name="county" class="field required" maxlength="50">
+                        <option value="Adams">Adams</option>
+                        <option value="Allegheny">Allegheny</option>
+                        <option value="Armstrong">Armstrong</option>
+                        <option value="Beaver">Beaver</option>
+                        <option value="Bedford">Bedford</option>
+                        <option value="Berks">Berks</option>
+                        <option value="Blair">Blair</option>
+                        <option value="Bradford">Bradford</option>
+                        <option value="Bucks">Bucks</option>
+                        <option value="Butler">Butler</option>
+                        <option value="Cambria">Cambria</option>
+                        <option value="Cameron">Cameron</option>
+                        <option value="Carbon">Carbon</option>
+                        <option value="Centre">Centre</option>
+                        <option value="Chester">Chester</option>
+                        <option value="Clarion">Clarion</option>
+                        <option value="Clearfield">Clearfield</option>
+                        <option value="Clinton">Clinton</option>
+                        <option value="Columbia">Columbia</option>
+                        <option value="Crawford">Crawford</option>
+                        <option value="Cumberland">Cumberland</option>
+                        <option value="Dauphin">Dauphin</option>
+                        <option value="Delaware">Delaware</option>
+                        <option value="Elk">Elk</option>
+                        <option value="Erie">Erie</option>
+                        <option value="Fayette">Fayette</option>
+                        <option value="Forest">Forest</option>
+                        <option value="Franklin">Franklin</option>
+                        <option value="Fulton">Fulton</option>
+                        <option value="Greene">Greene</option>
+                        <option value="Huntingdon">Huntingdon</option>
+                        <option value="Indiana">Indiana</option>
+                        <option value="Jefferson">Jefferson</option>
+                        <option value="Juniata">Juniata</option>
+                        <option value="Lackawanna">Lackawanna</option>
+                        <option value="Lancaster">Lancaster</option>
+                        <option value="Lawrence">Lawrence</option>
+                        <option value="Lebanon">Lebanon</option>
+                        <option value="Lehigh">Lehigh</option>
+                        <option value="Luzerne">Luzerne</option>
+                        <option value="Lycoming">Lycoming</option>
+                        <option value="McKean">McKean</option>
+                        <option value="Mercer">Mercer</option>
+                        <option value="Mifflin">Mifflin</option>
+                        <option value="Monroe">Monroe</option>
+                        <option value="Montgomery">Montgomery</option>
+                        <option value="Montour">Montour</option>
+                        <option value="Northampton">Northampton</option>
+                        <option value="Northumberland">Northumberland</option>
+                        <option value="Perry">Perry</option>
+                        <option value="Philadelphia">Philadelphia</option>
+                        <option value="Pike">Pike</option>
+                        <option value="Potter">Potter</option>
+                        <option value="Shuylkill">Shuylkill</option>
+                        <option value="Snyder">Snyder</option>
+                        <option value="Somerset">Somerset</option>
+                        <option value="Sullivan">Sullivan</option>
+                        <option value="Susquehanna">Susquehanna</option>
+                        <option value="Tioga">Tioga</option>
+                        <option value="Union">Union</option>
+                        <option value="Venango">Venango</option>
+                        <option value="Warren">Warren</option>
+                        <option value="Washington">Washington</option>
+                        <option value="Wayne">Wayne</option>
+                        <option value="Westmoreland">Westmoreland</option>
+                        <option value="Wyoming">Wyoming</option>
+                        <option value="York">York</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="fname">{% trans "Zip code" %} *</td>
+                <td><input name="zip_code" class="field required" maxlength="5" /></td>
+            </tr>
+            <tr>
+                <td class="fname">{% trans "Contest division" %} *</td>
+                <td>
+                    <select name="contest_division" class="field required">
+                        <option value="YOUTH">{% trans "Youth (Grades 5-12)" %}</option>
+                        <option value="ACADM">{% trans "Higher Ed (Undergraduate, Graduate, Professional)" %}</option>
+                        <option value="ADULT">{% trans "Adult (Non-student)" %}</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" id="values_choices_label">
+                  {% trans "Select up to three values that you prioritized while drawing your map: *" %}
+                </td>
+            </tr>
+            <tr id="values_choices_error_message" class="error">
+                <td colspan="2">
+                  {% trans "You must select from 1 to 3 values" %}
+                </td>
+            </tr>
+            <tr>
+                <td><ul>
+                  <!-- The "values_choices" class is used to limit the number of selections to 3 -->
+                  <li>
+                    <input name="values" id="val_coi" class="values_choices" value="Community(ies) of Interest" type="checkbox" />
+                    <label for="val_coi">{% trans "Community(ies) of Interest" %}</label>
+                  </li>
+                  <li>
+                    <input name="values" id="val_compact" class="values_choices" value="Compactness" type="checkbox" />
+                    <label for="val_compact">{% trans "Compactness" %}</label>
+                  </li>
+                  <li>
+                    <input name="values" id="val_cmpttive" class="values_choices" value="Competitive Elections" type="checkbox" />
+                    <label for="val_cmpttive">{% trans "Competitive Elections" %}</label>
+                  </li>
+                  <li>
+                    <input name="values" id="val_contiguity" class="values_choices" value="Contiguity" type="checkbox" />
+                    <label for="val_contiguity">{% trans "Contiguity" %}</label>
+                  </li>
+                  <li>
+                    <input name="values" id="val_equipop" class="values_choices" value="Equal Population" type="checkbox" />
+                    <label for="val_equipop">{% trans "Equal Population" %}</label>
+                  </li>
+                </ul></td>
+                <td><ul>
+                  <li>
+                    <input name="values" id="val_splits" class="values_choices" value="Jurisdictional Splits" type="checkbox" />
+                    <label for="val_splits">{% trans "Jurisdictional Splits" %}</label>
+                  </li>
+                  <li>
+                    <input name="values" id="val_repr" class="values_choices" value="Minority Representation" type="checkbox" />
+                    <label for="val_repr">{% trans "Minority Representation" %}</label>
+                  </li>
+                  <li>
+                    <input name="values" id="val_adv" class="values_choices" value="Party Advantage" type="checkbox" />
+                    <label for="val_adv">{% trans "Party Advantage" %}</label>
+                  </li>
+                  <li>
+                    <input name="values" id="val_other" class="values_choices" value="Other" type="checkbox" />
+                    <label for="val_other">{% trans "Other (explain in your personal statement)" %}</label>
+                  </li>
+                </ul></td>
             </tr>
             <tr>
                 <td colspan="2" id="values_text_column">
-                    {% trans "Values &ndash; tell us what values, considerations and trade-offs you made in your plan:" %}
+                  {% blocktrans %}
+                    Personal Statement &ndash; Please write or paste your Personal Statement (if
+                    text) into the box below. Or, include a link to your statement (if video, audio,
+                    or other). See <a href="https://drawthelinespa.org/uploads/attachments/cjlqoibxz01vjctr3dpmvfzz8-competition-dtlrules-2018-09.pdf" target="_blank">Competition Rules</a> for
+                    instructions on how to do your Personal Statement.
+                  {% endblocktrans %} *
                 </td>
             </tr>
             <tr>
                 <td colspan="2">
-                    <textarea id="more_info_text" name="description" rows="6" type="text" class="field required"></textarea>
+                    <textarea id="more_info_text" name="values_statement" rows="6" type="text" class="field required"></textarea>
                 </td>
             </tr>
             <tr>
@@ -367,7 +496,7 @@
                     and have it presented to a legislative body. Unless
                     you request otherwise, the project partners will attempt
                     to include attribution (your name or team name) for the
-                    plan whenever feasible.
+                    plan whenever possible.
                     {% endblocktrans %}
                 </td>
             </tr>
@@ -377,16 +506,50 @@
                 </td>
             </tr>
         </table>
-        <div id="email_plan_required_note"> * {% trans "Indicates required field" %} </div>        
+        <div id="email_plan_required_note"> * {% trans "Indicates required field" %} </div>
+        <div style="display:none">
+        <ul class="share-buttons" id="submit-share-buttons">
+          <li class="twitter-tweet">
+            <a href="https://twitter.com/intent/tweet"
+              data-text="I just submitted a voting map to the Draw the Lines PA mapping competition. Join me! @drawthelinespa #SlaytheGerrymander."
+              data-url="https://map.drawthelinespa.org/"
+              class="twitter-share-button">
+              {% trans "Tweet" %}
+            </a>
+            <script type="text/javascript" src="https://platform.twitter.com/widgets.js"></script>
+          </li>
+
+          <li class="facebook-like">
+            <div
+              class="fb-share-button"
+              data-href="https://map.drawthelinespa.org/"
+              data-text="I just submitted a voting map to the Draw the Lines PA mapping competition. Join me! @drawthelinespa #SlaytheGerrymander."
+              data-layout="button_count"
+              data-size="small"
+              data-mobile-iframe="true">
+                <a target="_blank"
+                  href="https://www.facebook.com/sharer/sharer.php?u=https://map.drawthelinespa.org/&amp;src=sdkpreparse"
+                  class="fb-xfbml-parse-ignore">{% trans "Share" %}
+                </a>
+            </div>
+          </li>
+
+          <li class="email-share">
+            <a id="email-share-link" href="mailto:?subject=I%20just%20submitted%20a%20voting%20map%20to%20the%20Draw%20the%20Lines%20PA%20mapping%20competition.%20Join%20me!%20%40drawthelinespa%20%23SlaytheGerrymander&body=https://map.drawthelinespa.org/">
+              <button id="email-share-button"><img id="email-share-img" src="{% static 'images/icon-mail.png' %}"></button>
+            </a>
+          </li>
+        </ul>
+        </div>
     </div>
-    <script type="text/javascript" src="/static-media/js/emailplan.js"></script>
+    <script type="text/javascript" src="{% static 'js/emailplan.js' %}"></script>
     <script type="text/javascript">
         $(function() {
             emailplan({
                 container: $('#email_plan_dialog'),
                 target: $('#btnEmailPlan'),
                 submitButton: $('#email_plan_submit_button'),
-                handlerUrl: '/districtmapping/plan/{{ plan.id }}/districtindexfilesend/'        
+                handlerUrl: '/districtmapping/plan/{{ plan.id }}/contest-submit/'
             }).init();
         });
     </script>
@@ -398,14 +561,14 @@
     <div id="districtComment" title="{% trans "Community Info" %}">
         <input type="hidden" value="{% trans "0" %}" id="id_district_pk" name="district_pk"/>
         <input type="hidden" value="" id="id_district_id" name="district_id"/>
-        
+
         <div class="dialog_step">
           <h3>{% trans "1. Edit Community Label:" %}</h3>
           <div id="district_label" class="district_input">
               <input type="text" class="field" value="" id="id_label" name="label" maxlength="200"/>
           </div>
         </div>
-        
+
         <div class="dialog_step">
           <h3>{% trans "2. Edit Community Type:" %}</h3>
           <div id="district_type" class="district_input">
@@ -416,14 +579,14 @@
               </select>
           </div>
         </div>
-        
+
         <div class="dialog_step">
           <h3>{% trans "3. Comments:" %}</h3>
               <p>
                   <textarea id="id_comment" name="comment" cols="40" rows="10"></textarea>
               </p>
         </div>
-        
+
         </div>
     </div>
     <div id="districtCommentErr" title="{% trans "Oops!" %}">

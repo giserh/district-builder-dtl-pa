@@ -1,0 +1,29 @@
+#!/bin/bash
+set -e
+
+GIT_COMMIT="${GIT_COMMIT:0:7}"
+
+function usage() {
+    echo -n \
+"Usage: $(basename "$0") [--with-airflow]
+
+Starts servers using docker-compose
+"
+}
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]
+then
+    if [ "${1:-}" = "--help" ]
+    then
+        usage
+    elif [ "${1:-}" = "--production" ]
+    then
+        GIT_COMMIT="${GIT_COMMIT}" docker-compose \
+            -f docker-compose.yml \
+            -f docker-compose.production.yml \
+            up -d --remove-orphans
+    else
+        docker-compose up --remove-orphans
+    fi
+    exit
+fi
