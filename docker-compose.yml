@@ -50,6 +50,7 @@ services:
     links:
       - redis:${KEY_VALUE_STORE_HOST}
       - geoserver:${MAP_SERVER_HOST}
+      - xray:${XRAY_DAEMON_HOST}
 
   celery:
     build:
@@ -79,6 +80,17 @@ services:
       - sld:/data/sld
     ports:
       - "${MAP_SERVER_PORT}:${WEB_APP_PORT}"
+      
+  xray:
+    build:
+      context: ./xray
+    env_file:
+      - .env
+    volumes:
+      - ~/.aws/:/root/.aws/:ro
+    ports:
+      - "${XRAY_DAEMON_PORT}:${XRAY_DAEMON_PORT}"
+      - "${XRAY_DAEMON_PORT}:${XRAY_DAEMON_PORT}/udp"
 
 volumes:
   reports:
