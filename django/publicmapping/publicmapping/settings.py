@@ -17,6 +17,12 @@ import os
 import logging.config
 import logging
 from . import REDIS_URL
+from aws_xray_sdk.core import xray_recorder
+from aws_xray_sdk.core import patch_all
+
+plugins = ["EC2Plugin"]
+xray_recorder.configure(plugins=plugins)
+patch_all()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -58,6 +64,7 @@ INSTALLED_APPS = [
     'rosetta',
     'tagging',
     'watchman',
+    'aws_xray_sdk.ext.django',
 
     # local
     'publicmapping',
@@ -66,6 +73,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'aws_xray_sdk.ext.django.middleware.XRayMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
